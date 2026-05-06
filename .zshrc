@@ -6,15 +6,16 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
-# Path to your oh-my-zsh installation.
+# Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
+# load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+# ZSH_THEME="robbyrussell"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to pick from when loading at random
@@ -77,7 +78,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git archlinux zsh-syntax-highlighting zsh-autosuggestions)
+plugins=(git zsh-syntax-highlighting zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -92,15 +93,18 @@ source $ZSH/oh-my-zsh.sh
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
-#   export EDITOR='mvim'
+#   export EDITOR='nvim'
 # fi
 
 # Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+# export ARCHFLAGS="-arch $(uname -m)"
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
@@ -110,23 +114,45 @@ source $ZSH/oh-my-zsh.sh
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-
 if [ -x "$(command -v colorls)" ]; then
     alias ls="colorls"
     alias la="colorls -al"
 fi
 
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
 
-source $(dirname $(gem which colorls))/tab_complete.sh
+# Load Angular CLI autocompletion.
+source <(ng completion script)
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_DEFAULT_OPS="--extended"
-export PATH=/home/amarthya/tools/ctags/bin:/home/amarthya/.nvm/versions/node/v16.15.0/bin:/home/amarthya/.rvm/gems/ruby-3.1.2/bin:/home/amarthya/.rvm/gems/ruby-3.1.2@global/bin:/home/amarthya/.rvm/rubies/ruby-3.1.2/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/amarthya/.rvm/bin:/home/amarthya/.rvm/bin:/home/amarthya/.rvm/bin
+export PATH=$PATH:/home/amarthya/.spicetify
+
+# ~/.zshrc
+
+lfcd () {
+    tmp="$(mktemp)"
+    # Launch lf and capture the last directory
+    lf -last-dir-path="$tmp"
+    if [ -f "$tmp" ]; then
+        dir="$(cat "$tmp")"
+        rm -f "$tmp"
+        [ -d "$dir" ] && cd "$dir"
+    fi
+}
+
+# Bind Ctrl+O to open lf in the current shell
+bindkey -s '^O' 'lfcd\n'
+
+export JAVA_HOME=/usr/lib/jvm/jdk-17.0.12-oracle-x64
+
+# opencode
+export PATH=/home/amarthya/.opencode/bin:$PATH
+export PATH=$PATH:/snap/bin
+export PATH=$PATH:/opt/zig
+export PATH=$PATH:/usr/local/zig
+export PATH=$PATH:/usr/local/zig
+alias kubectl='microk8s kubectl'
