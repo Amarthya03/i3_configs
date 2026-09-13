@@ -28,6 +28,9 @@ font pango:MesloLGL Nerd Font 10
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex --autostart --environment i3
 
+# Notification daemon (explicit start, not relying on D-Bus auto-activation)
+exec --no-startup-id dunst
+
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
 
@@ -46,11 +49,10 @@ exec --no-startup-id blueman-applet
 
 
 # Use pactl to adjust volume in PulseAudio.
-set $refresh_i3status killall -SIGUSR1 i3status
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
-bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id ~/.config/scripts/volume-notify.sh up
+bindsym XF86AudioLowerVolume exec --no-startup-id ~/.config/scripts/volume-notify.sh down
+bindsym XF86AudioMute exec --no-startup-id ~/.config/scripts/volume-notify.sh mute
+bindsym XF86AudioMicMute exec --no-startup-id ~/.config/scripts/volume-notify.sh mic-mute
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -60,11 +62,11 @@ floating_modifier $mod
 tiling_drag modifier titlebar
 
 # start a terminal
-# bindsym $mod+Return exec i3-sensible-terminal
+# bindsym $mod+Return exec st 
 bindsym $mod+Return exec gnome-terminal
 
 # Open VS Code
-bindsym $mod+Shift+Return exec cursor
+bindsym $mod+Shift+Return exec code
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -73,6 +75,13 @@ bindsym $mod+Shift+q kill
 # bindsym $mod+d exec --no-startup-id dmenu_run
 # bindsym $mod+d exec --no-startup-id rofi -show run -show combi icon-theme "Papirus" -show-icons
 bindsym $mod+d exec --no-startup-id rofi -show drun -theme /home/amarthya/.config/rofi/launchers/type-7/style-1.rasi
+
+# rofi power menu (type-5, style-1)
+bindsym $mod+Escape exec --no-startup-id ~/.config/rofi/scripts/powermenu_t5
+
+# rofi display switcher (xrandr, i3/X11 only)
+bindsym $mod+p exec --no-startup-id ~/.config/rofi/scripts/displays_menu
+
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -108,6 +117,9 @@ bindsym $mod+h split h
 
 # split in vertical orientation
 bindsym $mod+v split v
+
+# Voxtype push-to-talk (toggle mode: press once to start, again to stop)
+bindsym $mod+Ctrl+v exec --no-startup-id voxtype record toggle
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
@@ -224,7 +236,7 @@ bar {
 	status_command bumblebee-status -m cpu memory disk nic \
         spotify docker_ps date time battery bluetooth2 \
         -p time.format="%I:%M:%S %p" date.format="%a, %b %d %Y"  \
-        nic.exclude="lo,virbr,docker,vboxnet,veth,br,.*:avahi,cali,vxlan" \
+        nic.exclude="lo,virbr,docker,vboxnet,veth,br,eno1,.*:avahi,cali,vxlan" \
         nic.format="{intf} {ssid} {ip} {state} {strength}" \
         -t gruvbox-powerline
 
